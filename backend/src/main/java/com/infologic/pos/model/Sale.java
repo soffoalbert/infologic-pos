@@ -56,4 +56,4 @@ public class Sale {
     public enum SaleStatus {
         COMPLETED, REFUNDED, PARTIALLY_REFUNDED, VOIDED
     }
-} 
+}

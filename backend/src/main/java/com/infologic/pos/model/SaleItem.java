@@ -41,4 +41,4 @@ public class SaleItem {
     public void calculateSubtotal() {
         this.subtotal = this.unitPrice.multiply(BigDecimal.valueOf(this.quantity));
     }
-} 
+}
