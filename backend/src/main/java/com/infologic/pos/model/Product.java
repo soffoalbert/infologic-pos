@@ -36,4 +36,4 @@ public class Product {
     // Tenant identifier for multi-tenancy
     @Column(name = "tenant_id", nullable = false)
     private String tenantId;
-} 
+} // Adding a test comment to create a difference
