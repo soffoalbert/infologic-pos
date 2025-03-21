@@ -1,31 +1,47 @@
 package com.infologic.pos.repository;
 
-import com.infologic.pos.model.Product;
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
-import java.util.List;
-import java.util.Optional;
+import com.infologic.pos.model.Product;
 
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
     
-    // Find all products for a specific tenant
-    List<Product> findByTenantId(String tenantId);
+    Optional<Product> findByIdAndTenantId(Long id, String tenantId);
     
-    // Find products by category for a specific tenant
-    List<Product> findByTenantIdAndCategory(String tenantId, String category);
+    Page<Product> findByTenantId(String tenantId, Pageable pageable);
     
-    // Find a product by SKU for a specific tenant
-    Optional<Product> findByTenantIdAndSku(String tenantId, String sku);
+    List<Product> findByTenantIdOrderByNameAsc(String tenantId);
     
-    // Find products with stock below a given threshold for a specific tenant
-    List<Product> findByTenantIdAndStockLessThan(String tenantId, Integer threshold);
+    Page<Product> findByNameContainingAndTenantId(String name, String tenantId, Pageable pageable);
     
-    // Search products by name or SKU for a specific tenant
-    @Query("SELECT p FROM Product p WHERE p.tenantId = :tenantId AND (LOWER(p.name) LIKE LOWER(CONCAT('%', :query, '%')) OR LOWER(p.sku) LIKE LOWER(CONCAT('%', :query, '%')))")
+    Page<Product> findByCategoryAndTenantId(String category, String tenantId, Pageable pageable);
+    
+    List<Product> findByCategoryAndTenantIdOrderByNameAsc(String category, String tenantId);
+    
+    Optional<Product> findBySkuAndTenantId(String sku, String tenantId);
+    
+    Optional<Product> findByBarcodeAndTenantId(String barcode, String tenantId);
+    
+    List<Product> findByStockQuantityLessThanAndTenantId(Integer threshold, String tenantId);
+    
+    boolean existsBySkuAndTenantId(String sku, String tenantId);
+    
+    boolean existsByBarcodeAndTenantId(String barcode, String tenantId);
+    
+    @Query("SELECT p FROM Product p WHERE p.tenantId = :tenantId AND " +
+           "(p.name LIKE %:query% OR p.sku LIKE %:query% OR p.barcode LIKE %:query% OR p.category LIKE %:query%)")
     List<Product> searchProducts(@Param("tenantId") String tenantId, @Param("query") String query);
+    
+    @Query("SELECT p FROM Product p WHERE p.tenantId = :tenantId AND " +
+           "p.stockQuantity <= p.alertThreshold AND p.stockQuantity > 0")
+    List<Product> findProductsBelowAlertThreshold(@Param("tenantId") String tenantId);
 } 

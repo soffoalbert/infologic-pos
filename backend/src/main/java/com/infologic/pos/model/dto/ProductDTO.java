@@ -15,7 +15,7 @@ public class ProductDTO {
     private String name;
     private String sku;
     private BigDecimal price;
-    private Integer stock;
+    private Integer stockQuantity;
     private String category;
     
     // Convert from Entity to DTO
@@ -25,7 +25,7 @@ public class ProductDTO {
         dto.setName(product.getName());
         dto.setSku(product.getSku());
         dto.setPrice(product.getPrice());
-        dto.setStock(product.getStock());
+        dto.setStockQuantity(product.getStockQuantity());
         dto.setCategory(product.getCategory());
         return dto;
     }
@@ -37,7 +37,7 @@ public class ProductDTO {
         product.setName(this.name);
         product.setSku(this.sku);
         product.setPrice(this.price);
-        product.setStock(this.stock);
+        product.setStockQuantity(this.stockQuantity);
         product.setCategory(this.category);
         product.setTenantId(tenantId);
         return product;

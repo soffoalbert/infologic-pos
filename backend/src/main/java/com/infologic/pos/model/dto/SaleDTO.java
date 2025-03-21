@@ -16,24 +16,24 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class SaleDTO {
     private Long id;
-    private LocalDateTime timestamp;
+    private LocalDateTime createdAt;
     private BigDecimal total;
-    private String paymentMethod;
+    private Sale.PaymentMethod paymentMethod;
     private String status;
     private List<SaleItemDTO> items = new ArrayList<>();
-    private String clientReferenceId;
+    private String paymentReference;
     private boolean offlineCreated;
     
     // Convert from Entity to DTO
     public static SaleDTO fromEntity(Sale sale) {
         SaleDTO dto = new SaleDTO();
         dto.setId(sale.getId());
-        dto.setTimestamp(sale.getTimestamp());
-        dto.setTotal(sale.getTotal());
+        dto.setCreatedAt(sale.getCreatedAt());
+        dto.setTotal(sale.getTotalAmount());
         dto.setPaymentMethod(sale.getPaymentMethod());
         dto.setStatus(sale.getStatus().name());
-        dto.setClientReferenceId(sale.getClientReferenceId());
-        dto.setOfflineCreated(sale.isOfflineCreated());
+        dto.setPaymentReference(sale.getPaymentReference());
+//        dto.setOfflineCreated(sale.isOfflineCreated());
         
         dto.setItems(sale.getItems().stream()
                 .map(SaleItemDTO::fromEntity)
@@ -46,13 +46,13 @@ public class SaleDTO {
     public Sale toEntity(Long userId, String tenantId) {
         Sale sale = new Sale();
         sale.setId(this.id);
-        sale.setTimestamp(this.timestamp != null ? this.timestamp : LocalDateTime.now());
-        sale.setTotal(this.total);
+        sale.setCreatedAt(this.createdAt != null ? this.createdAt : LocalDateTime.now());
+        sale.setTotalAmount(this.total);
         sale.setPaymentMethod(this.paymentMethod);
         sale.setStatus(Sale.SaleStatus.valueOf(this.status));
-        sale.setClientReferenceId(this.clientReferenceId);
-        sale.setOfflineCreated(this.offlineCreated);
-        sale.setUserId(userId);
+        sale.setPaymentReference(this.paymentReference);
+//        sale.setOfflineCreated(this.offlineCreated);
+//        sale.setUserId(userId);
         sale.setTenantId(tenantId);
         
         return sale;

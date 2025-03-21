@@ -1,59 +1,97 @@
 package com.infologic.pos.model;
 
-import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
+
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "sales")
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Sale {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
-    @Column(nullable = false)
-    private LocalDateTime timestamp;
-    
-    @Column(nullable = false, precision = 10, scale = 2)
-    private BigDecimal total;
-    
-    @Column(nullable = false)
-    private String paymentMethod;
-    
+
+    @Column(name = "invoice_number", unique = true)
+    private String invoiceNumber;
+
+    @Column(name = "customer_name")
+    private String customerName;
+
+    @Column(name = "customer_phone")
+    private String customerPhone;
+
+    @Column(name = "customer_email")
+    private String customerEmail;
+
+    @Column(name = "total_amount", nullable = false)
+    private BigDecimal totalAmount;
+
+    @Column(name = "tax_amount")
+    private BigDecimal taxAmount;
+
+    @Column(name = "discount_amount")
+    private BigDecimal discountAmount;
+
+    @Column(name = "payment_method")
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    private PaymentMethod paymentMethod;
+
+    @Column(name = "payment_reference")
+    private String paymentReference;
+
+    @Column(name = "sale_status")
+    @Enumerated(EnumType.STRING)
     private SaleStatus status;
-    
-    @OneToMany(mappedBy = "sale", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<SaleItem> items = new ArrayList<>();
-    
-    // Reference to the user who processed the sale
-    @Column(name = "user_id", nullable = false)
-    private Long userId;
-    
-    // Tenant identifier for multi-tenancy
-    @Column(name = "tenant_id", nullable = false)
+
+    @Column(name = "notes")
+    private String notes;
+
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    @Column(name = "cashier_id")
+    private Long cashierId;
+
+    @Column(name = "tenant_id")
     private String tenantId;
+
+    @OneToMany(mappedBy = "sale", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<SaleItem> items = new HashSet<>();
     
-    // Flag to indicate if this sale was made offline
-    @Column(nullable = false)
-    private boolean offlineCreated = false;
-    
-    // Unique identifier generated on the client side for offline sales
-    @Column(unique = true)
-    private String clientReferenceId;
+    public enum PaymentMethod {
+        CASH, CREDIT_CARD, DEBIT_CARD, MOBILE_MONEY, BANK_TRANSFER, FLUTTERWAVE, STRIPE, MPESA
+    }
     
     public enum SaleStatus {
-        COMPLETED, REFUNDED, PARTIALLY_REFUNDED, VOIDED
+        PENDING, COMPLETED, CANCELLED, REFUNDED
     }
 } 
